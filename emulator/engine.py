@@ -1,8 +1,11 @@
 #
 # Emulator engine main class
 #
-
+from emulator.controls import Controls
+from emulator.graphics import Graphics
 from emulator.opcodes import process_opcode
+from emulator.sound import Sound
+
 
 class Emulator:
     def __init__(self):
@@ -40,11 +43,20 @@ class Emulator:
         self.pre_frame_hooks= dict()
         self.post_frame_hooks = dict()
 
-        # Debug flag
+        # Modules
+        self.controls:Controls = None
+        self.gfx:Graphics = None
+        self.sound:Sound = None
+
+        # Flags
+        self.graphics_enabled = False
+        self.controls_enabled = False
+        self.sound_enabled = False
         self.debug = False
 
-        # Graphics flag
-        self.graphics_enabled = False
+        self.draw_flag = False
+        self.beep_flag = False
+
 
 
     def load_rom(self, f):
@@ -62,42 +74,35 @@ class Emulator:
     def setup_sound(self):
         pass
 
-    def emulate_cycle(self):
 
-        process_opcode(self)
+
+
+    def gameloop(self):
+
+        # Call the graphical engine, if present
+        if self.graphics_enabled:
+            if self.draw_flag:
+                self.gfx.draw()
+                self.draw_flag = False
+
+        # Capture the key state
+        if self.controls_enabled:
+            self.controls.get_key()
 
         if self.delay_timer > 0:
             self.delay_timer -= 1
 
         if self.sound_timer > 0:
             if self.sound_timer == 1:
-                self.play_sound()
+                self.sound.beep()
+                self.beep_flag = False
+            self.sound_timer -= 1
 
-            self.sound_timer-=1
-
-
-    def capture_keys(self):
-        pass
-
-    def draw(self):
-        pass
-
-    def gameloop(self):
-
-        # Main function of the loop
-        self.emulate_cycle()
-
-        # Call the graphical engine, if present
-        if self.graphics_enabled:
-            self.draw()
-
-        # Capture the key state
-        self.capture_keys()
+        process_opcode(self)
 
 
 
     def start(self):
-        self.initialize_chip_8()
         self.call_init_hooks()
 
         while True:
@@ -107,11 +112,21 @@ class Emulator:
 
 
 
-    def enable_debug(self):
-        self.debug=True
 
-    def enable_graphics(self):
-        pass
+#### Engines
+
+    def add_gfx(self, gfx:Graphics):
+        self.gfx=gfx
+
+    def add_sound(self, sound:Sound):
+        self.sound=sound
+
+    def add_controls(self, controls:Controls):
+        self.controls=controls
+
+
+
+#### Hooks
 
     def add_init_hook(self, hook_name, hook_function):
         self.init_hooks[hook_name]=hook_function
@@ -133,6 +148,12 @@ class Emulator:
     def call_post_hooks(self):
         for k, v in self.post_frame_hooks.items():
             v[0](self, v[1:])
+
+
+#### Debug
+
+    def enable_debug(self):
+        self.debug=True
 
     def print_status(self):
         print("Memory"+self.memory)
