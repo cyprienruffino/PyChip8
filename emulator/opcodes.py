@@ -113,7 +113,46 @@ def xE000(e:Emulator):
     pass
 
 def xF000(e:Emulator):
-    pass
+    # FX07 => VX = get_delay()
+    if (e.opcode & 0x00FF) == 0x0007:
+        e.V[(e.opcode & 0x0F00) >> 8] = e.delay_timer
+
+    # FX0A => VX = get_key() (Blocking!)
+    if (e.opcode & 0x00FF) == 0x000A:
+        e.V[(e.opcode & 0x0F00) >> 8] = e.controls.get_key()
+
+    # FX15 => set_delay(VX)
+    if (e.opcode & 0x00FF) == 0x0015:
+        e.delay_timer = e.V[(e.opcode & 0x0F00) >> 8]
+
+    # FX18 => VX = set_sound(VX)
+    if (e.opcode & 0x00FF) == 0x0018:
+        e.sound_timer = e.V[(e.opcode & 0x0F00) >> 8]
+
+    # FX1E => I += VX
+    if (e.opcode & 0x00FF) == 0x001E:
+        e.I += e.V[(e.opcode & 0x0F00) >> 8]
+
+    # FX29 => I = get_char_addr[VX]
+    if (e.opcode & 0x00FF) == 0x0029:
+        #TODO When the font set implementation is done
+        pass
+
+    # FX33 => memory[I, I+1, I+2] = binary_coded_decimal(VX)
+    if (e.opcode & 0x00FF) == 0x0033:
+        #TODO
+        pass
+
+    # FX55 => save(VX, &I)
+    if (e.opcode & 0x00FF) == 0x0055:
+        for i in range(0, e.V[(e.opcode & 0x0F00) >> 8]+1):
+            e.memory[i+e.I]=e.V[i]
+
+    # FX65 => load(VX, &I)
+    if (e.opcode & 0x00FF) == 0x0065:
+        for i in range(0, e.V[(e.opcode & 0x0F00) >> 8]+1):
+            e.V[i]=e.memory[i+e.I]
+
 
 
 def process_opcode(e: Emulator):

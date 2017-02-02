@@ -22,7 +22,7 @@ class Emulator:
         self.sp = 0x0200
 
         # Graphics array (64*32px), black and white
-        self.gfx = bytearray(64*32)
+        self.gfx_pixels = bytearray(64*32)
 
         # Current operation
         self.opcode = 0x0000
@@ -68,33 +68,28 @@ class Emulator:
                 byte = f.read(1)
                 i+=1
 
-    def setup_graphics(self):
-        pass
-
-    def setup_sound(self):
-        pass
-
-
-
 
     def gameloop(self):
 
-        # Call the graphical engine, if present
+        # Calls the graphics module, if present
         if self.graphics_enabled:
             if self.draw_flag:
                 self.gfx.draw()
                 self.draw_flag = False
 
-        # Capture the key state
+        # Calls the controls module, if present
         if self.controls_enabled:
             self.controls.get_key()
 
         if self.delay_timer > 0:
             self.delay_timer -= 1
 
+
         if self.sound_timer > 0:
             if self.sound_timer == 1:
-                self.sound.beep()
+                # Calls the sound module, if present
+                if self.controls_enabled:
+                    self.sound.beep()
                 self.beep_flag = False
             self.sound_timer -= 1
 
@@ -106,14 +101,16 @@ class Emulator:
         self.call_init_hooks()
 
         while True:
+            self.start_cycle_timer()
+
             self.call_pre_hooks()
             self.gameloop()
             self.call_post_hooks()
 
+            self.wait_for_timer()
 
 
-
-#### Engines
+#### Modules
 
     def add_gfx(self, gfx:Graphics):
         self.gfx=gfx
@@ -123,6 +120,13 @@ class Emulator:
 
     def add_controls(self, controls:Controls):
         self.controls=controls
+
+    def start_cycle_timer(self):
+        pass
+
+    def wait_for_timer(self):
+        pass
+
 
 
 
@@ -164,6 +168,7 @@ class Emulator:
         print("Program counter"+self.pc)
         print("Delay timer"+self.delay_timer)
         print("Soundtimer"+self.sound_timer)
+
 
 
 
