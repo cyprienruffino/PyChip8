@@ -1,4 +1,4 @@
-from emulator.sound import Sound
+from emulator.modules.sound import Sound
 
 
 class SoundStub(Sound):

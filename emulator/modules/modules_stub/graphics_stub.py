@@ -1,4 +1,4 @@
-from emulator.graphics import Graphics
+from emulator.modules.graphics import Graphics
 
 class GraphicsStub(Graphics):
     def __init__(self):

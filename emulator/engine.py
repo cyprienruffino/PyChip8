@@ -1,10 +1,12 @@
 #
 # Emulator engine main class
 #
-from emulator.controls import Controls
-from emulator.graphics import Graphics
+from emulator.hooks.hook_interface import Hook
+from emulator.modules.graphics import Graphics
+from emulator.modules.sound import Sound
+
+from emulator.modules.controls import Controls
 from emulator.opcodes import process_opcode
-from emulator.sound import Sound
 
 
 class Emulator:
@@ -74,12 +76,12 @@ class Emulator:
         # Calls the graphics module, if present
         if self.graphics_enabled:
             if self.draw_flag:
-                self.gfx.draw()
+                self.gfx.draw(self)
                 self.draw_flag = False
 
         # Calls the controls module, if present
         if self.controls_enabled:
-            self.controls.get_key()
+            self.controls.get_key(self)
 
         if self.delay_timer > 0:
             self.delay_timer -= 1
@@ -128,30 +130,28 @@ class Emulator:
         pass
 
 
-
-
 #### Hooks
 
-    def add_init_hook(self, hook_name, hook_function):
-        self.init_hooks[hook_name]=hook_function
+    def add_init_hook(self, hook:Hook):
+        self.init_hooks[hook.name]=hook
 
-    def add_pre_frame_hook(self, hook_name, hook_function):
-        self.pre_frame_hooks[hook_name]=hook_function
+    def add_pre_frame_hook(self, hook:Hook):
+        self.pre_frame_hooks[hook.name]=hook
 
-    def add_post_frame_hook(self, hook_name, hook_function):
-        self.post_frame_hooks[hook_name]=hook_function
+    def add_post_frame_hook(self, hook:Hook):
+        self.post_frame_hooks[hook.name]=hook
 
     def call_init_hooks(self):
         for k, v in self.init_hooks.items():
-            v[0](self, v[1:])
+            v.apply(self)
 
     def call_pre_hooks(self):
         for k, v in self.pre_frame_hooks.items():
-            v[0](self, v[1:])
+            v.apply(self)
 
     def call_post_hooks(self):
         for k, v in self.post_frame_hooks.items():
-            v[0](self, v[1:])
+            v.apply(self)
 
 
 #### Debug

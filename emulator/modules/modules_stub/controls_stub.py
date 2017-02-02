@@ -1,5 +1,5 @@
-from emulator.controls import Controls
 from emulator.engine import Emulator
+from emulator.modules.controls import Controls
 
 
 class ControlsStub(Controls):
