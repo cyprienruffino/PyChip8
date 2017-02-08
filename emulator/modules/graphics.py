@@ -1,5 +1,3 @@
-from emulator.engine import Emulator
-
 
 class Graphics:
 
@@ -9,9 +7,9 @@ class Graphics:
     def open_view(self):
         raise "Abstract class, cannot be instanciated"
 
-    def draw(self, e:Emulator):
+    def draw(self, gfx:bytearray):
         raise "Abstract class, cannot be instanciated"
 
-    def draw_sprite(self, e:Emulator, VX, VY, N):
+    def draw_sprite(self, sprite:bytearray, VX, VY, N):
         raise "Abstract class, cannot be instanciated"
 

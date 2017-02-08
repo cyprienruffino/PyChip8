@@ -1,5 +1,3 @@
-from emulator.engine import Emulator
-
 
 class Sound:
 
