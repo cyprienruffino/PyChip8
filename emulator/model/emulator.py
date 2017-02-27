@@ -231,9 +231,20 @@ class Emulator:
 
 
     def xD000(self):
-        #TODO Do display
-        self.pc += 2
+        x = self.V[((self.opcode & 0x0F00) >> 8)]
+        y = self.V[((self.opcode & 0x0F00) >> 4)]
+        height = self.opcode & 0x000F
+        self.V[0xF] = 0x0
 
+        for ty in range(0,height):
+            pixel = self.memory[self.I + ty]
+            for tx in range(0,8):
+                if (pixel & (0x80 >> tx)) != 0:
+                    if self.gfx_pixels[(x + tx + ((y + ty) * 64))] == 1:
+                        self.V[0xF] = 1
+                    self.gfx_pixels[x + tx + ((y + ty) * 64)] |= 1
+
+    pass
 
     def xE000(self):
         if self.opcode & 0x00FF == 0x009E:
