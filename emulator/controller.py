@@ -5,7 +5,7 @@ from model.emulator import Emulator
 from view.sound import Sound
 
 
-class Runner:
+class Controller:
     def __init__(self, gfx:Graphics=None, sound:Sound=None, controls:Controls=None):
 
         self.emulator=Emulator()
