@@ -3,11 +3,7 @@
 #
 import random
 
-from emulator.modules.graphics import Graphics
-from emulator.modules.controls import Controls
-from emulator.modules.sound import Sound
-
-class Emulator:
+class Emulator():
 
 #### RAM and operations initialisation
 
@@ -17,6 +13,7 @@ class Emulator:
         # 0x000 -> 0x1FF : CHIP-8 Interpreter
         # 0x050 -> 0x0A0 : Font set (4x5 pixel, 0-F)
         # 0x200 -> 0xFFF : Program ROM and work RAM
+        self.key = 0x0
         self.memory = bytearray(4096)
 
         # Stack
@@ -41,22 +38,27 @@ class Emulator:
         self.delay_timer = 0
         self.sound_timer = 0
 
-        # Hooks for the environment
-        self.init_hooks = dict()
-        self.pre_frame_hooks= dict()
-        self.post_frame_hooks = dict()
-
-        # Modules
-        self.controls:Controls = None
-        self.gfx:Graphics = None
-        self.sound:Sound = None
+        # Fontset map
+        fontset = {
+            "0": bytearray(b'\xF0\x90\x90\x90\xF0'),
+            "1": bytearray(b'\x20\x60\x20\x20\x70'),
+            "2": bytearray(b'\xF0\x10\xF0\x80\xF0'),
+            "3": bytearray(b'\xF0\x10\xF0\x10\xF0'),
+            "4": bytearray(b'\x90\x90\xF0\x10\x10'),
+            "5": bytearray(b'\xF0\x80\xF0\x10\xF0'),
+            "6": bytearray(b'\xF0\x80\xF0\x90\xF0'),
+            "7": bytearray(b'\xF0\x10\x20\x40\x40'),
+            "8": bytearray(b'\xF0\x90\xF0\x90\xF0'),
+            "9": bytearray(b'\xF0\x90\xF0\x10\xF0'),
+            "A": bytearray(b'\xF0\x90\xF0\x90\x90'),
+            "B": bytearray(b'\xE0\x90\xE0\x90\xE0'),
+            "C": bytearray(b'\xF0\x80\x80\x80\xF0'),
+            "D": bytearray(b'\xE0\x90\x90\x90\xE0'),
+            "E": bytearray(b'\xF0\x80\xF0\x80\xF0'),
+            "F": bytearray(b'\xF0\x90\xF0\x90\x80')
+        }
 
         # Flags
-        self.graphics_enabled = False
-        self.controls_enabled = False
-        self.sound_enabled = False
-        self.debug = False
-
         self.draw_flag = False
         self.beep_flag = False
 
@@ -70,16 +72,6 @@ class Emulator:
             0xC000: self.xC000, 0xD000: self.xD000,
             0xE000: self.xE000, 0xF000: self.xF000,
         }
-
-    def load_rom(self, f):
-        with open(f, "rb") as f:
-            byte = f.read(1)
-            i=0
-            while byte != b'':
-                self.memory[i+512] = byte[0]
-                byte = f.read(1)
-                i+=1
-
 
     def none(self):
         self.pc += 2
@@ -248,7 +240,7 @@ class Emulator:
 
         # FX0A => VX = get_key() (Blocking!)
         if (self.opcode & 0x00FF) == 0x000A:
-            self.V[(self.opcode & 0x0F00) >> 8] = self.controls.get_key()
+            self.V[(self.opcode & 0x0F00) >> 8] = self.key
 
         # FX15 => set_delay(VX)
         if (self.opcode & 0x00FF) == 0x0015:
@@ -295,19 +287,14 @@ class Emulator:
 
 
 
-#### Engine
+    #### Engine
+    def load_rom(self, rom):
+        for i in range(0,len(rom)):
+            self.memory[i+512] = rom[i]
 
-    def gameloop(self):
-
-        # Calls the graphics module, if present
-        if self.graphics_enabled:
-            if self.draw_flag:
-                self.gfx.draw(self.gfx_pixels)
-                self.draw_flag = False
-
-        # Calls the controls module, if present
-        if self.controls_enabled:
-            self.controls.get_key(self)
+    def gamestep(self):
+        if self.draw_flag:
+            self.draw_flag = False
 
         if self.delay_timer > 0:
             self.delay_timer -= 1
@@ -315,100 +302,14 @@ class Emulator:
 
         if self.sound_timer > 0:
             if self.sound_timer == 1:
-                # Calls the sound module, if present
-                if self.controls_enabled:
-                    self.sound.beep()
                 self.beep_flag = False
             self.sound_timer -= 1
 
         self.process_opcode()
 
 
-#### Modules
-
-    def add_gfx(self, gfx:Graphics):
-        self.gfx=gfx
-
-    def add_sound(self, sound:Sound):
-        self.sound=sound
-
-    def add_controls(self, controls:Controls):
-        self.controls=controls
-
-    def start_cycle_timer(self):
+    def gamestep_backwards(self):
         pass
 
-    def wait_for_timer(self):
+    def set_key(self, key):
         pass
-
-
-#### Hooks
-
-    def add_init_hook(self, name:str, function):
-        self.init_hooks[name]=function
-
-    def add_pre_frame_hook(self, name:str, function):
-        self.pre_frame_hooks[name]=function
-
-    def add_post_frame_hook(self, name:str, function):
-        self.post_frame_hooks[name]=function
-
-    def call_init_hooks(self):
-        for k, v in self.init_hooks.items():
-            v()
-
-    def call_pre_hooks(self):
-        for k, v in self.pre_frame_hooks.items():
-            v()
-
-    def call_post_hooks(self):
-        for k, v in self.post_frame_hooks.items():
-            v()
-
-
-#### Debug
-
-    def enable_debug(self):
-        self.debug=True
-
-    def print_status(self):
-
-        #print("Memory")
-        #for i in self.memory: print(i)
-
-        #print("Graphics")
-
-        #for y in range(0, 32):
-        #    line = ""
-        #    for x in range(0, 64):
-        #        line+= " "+str(self.gfx_pixels[x*32+y])
-        #    print(line)
-
-        print("Current op "+str(self.opcode))
-
-        print("Registers")
-        regs=""
-        for i in range(0,16):
-            regs+=" V"+str(i)+" "+str(self.V[i])
-        print(regs)
-
-        print("Index "+str(self.I))
-        print("Program counter "+str(self.pc))
-        #print("Delay timer "+str(self.delay_timer))
-        #print("Soundtimer "+str(self.sound_timer))
-
-
-#### Start
-
-    def start(self):
-
-        self.call_init_hooks()
-
-        while True:
-            self.start_cycle_timer()
-
-            self.call_pre_hooks()
-            self.gameloop()
-            self.call_post_hooks()
-
-            self.wait_for_timer()
