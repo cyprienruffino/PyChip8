@@ -3,7 +3,7 @@
 #
 import random
 
-class Emulator():
+class Emulator:
 
 #### RAM and operations initialisation
 
@@ -38,25 +38,33 @@ class Emulator():
         self.delay_timer = 0
         self.sound_timer = 0
 
-        # Fontset map
-        fontset = {
-            "0": bytearray(b'\xF0\x90\x90\x90\xF0'),
-            "1": bytearray(b'\x20\x60\x20\x20\x70'),
-            "2": bytearray(b'\xF0\x10\xF0\x80\xF0'),
-            "3": bytearray(b'\xF0\x10\xF0\x10\xF0'),
-            "4": bytearray(b'\x90\x90\xF0\x10\x10'),
-            "5": bytearray(b'\xF0\x80\xF0\x10\xF0'),
-            "6": bytearray(b'\xF0\x80\xF0\x90\xF0'),
-            "7": bytearray(b'\xF0\x10\x20\x40\x40'),
-            "8": bytearray(b'\xF0\x90\xF0\x90\xF0'),
-            "9": bytearray(b'\xF0\x90\xF0\x10\xF0'),
-            "A": bytearray(b'\xF0\x90\xF0\x90\x90'),
-            "B": bytearray(b'\xE0\x90\xE0\x90\xE0'),
-            "C": bytearray(b'\xF0\x80\x80\x80\xF0'),
-            "D": bytearray(b'\xE0\x90\x90\x90\xE0'),
-            "E": bytearray(b'\xF0\x80\xF0\x80\xF0'),
-            "F": bytearray(b'\xF0\x90\xF0\x90\x80')
-        }
+        # Fontset
+        # 16 pre-loaded sprites : 0-F
+        # 1 Sprite : 8x5 px
+        # 5 bytes each
+        fontset = bytearray(
+            b'\xF0\x90\x90\x90\xF0'
+            b'\x20\x60\x20\x20\x70'
+            b'\xF0\x10\xF0\x80\xF0'
+            b'\xF0\x10\xF0\x10\xF0'
+            b'\x90\x90\xF0\x10\x10'
+            b'\xF0\x80\xF0\x10\xF0'
+            b'\xF0\x80\xF0\x90\xF0'
+            b'\xF0\x10\x20\x40\x40'
+            b'\xF0\x90\xF0\x90\xF0'
+            b'\xF0\x90\xF0\x10\xF0'
+            b'\xF0\x90\xF0\x90\x90'
+            b'\xE0\x90\xE0\x90\xE0'
+            b'\xF0\x80\x80\x80\xF0'
+            b'\xE0\x90\x90\x90\xE0'
+            b'\xF0\x80\xF0\x80\xF0'
+            b'\xF0\x90\xF0\x90\x80'
+        )
+
+        for i in range(0,len(fontset)):
+            self.memory[i]=fontset[i]
+
+        del fontset
 
         # Flags
         self.draw_flag = False
@@ -255,9 +263,8 @@ class Emulator():
             self.I += self.V[(self.opcode & 0x0F00) >> 8]
 
         # FX29 => I = get_char_addr[VX]
-        # TODO When the font set implementation is done
         if (self.opcode & 0x00FF) == 0x0029:
-            pass
+            self.I = self.V[((self.opcode & 0x0F00) >> 8) * 5]
 
         # FX33 => memory[I, I+1, I+2] = binary_coded_decimal(VX)
         if (self.opcode & 0x00FF) == 0x0033:
