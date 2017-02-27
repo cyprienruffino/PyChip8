@@ -7,5 +7,5 @@ class ControlsStub(Controls):
         pass
 
     def get_key(self):
-        pass
+        return 0
 

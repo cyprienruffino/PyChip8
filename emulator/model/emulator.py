@@ -13,7 +13,6 @@ class Emulator:
         # 0x000 -> 0x1FF : CHIP-8 Interpreter
         # 0x050 -> 0x0A0 : Font set (4x5 pixel, 0-F)
         # 0x200 -> 0xFFF : Program ROM and work RAM
-        self.key = 0x0
         self.memory = bytearray(4096)
 
         # Stack
@@ -26,6 +25,9 @@ class Emulator:
 
         # Current operation
         self.opcode = 0x0000
+
+        # Current keys
+        self.key = [False] * 16
 
         # Registers : 15 usable, 1 for the carry flag
         self.V = bytearray(16)
@@ -69,6 +71,9 @@ class Emulator:
         # Flags
         self.draw_flag = False
         self.beep_flag = False
+        self.key_wait_flag = True
+
+        self.key_register = 0x0 # Register which will receive the key when waiting for key
 
         self.opcode_switch = {
             0x0000: self.x0000, 0x1000: self.x1000,
@@ -206,7 +211,6 @@ class Emulator:
 
     # 9XY0 => skip_next(VX!=VY)
     def x9000(self):
-        print("toto")
         self.pc += 2
         if self.V[(self.opcode & 0x0F00) >> 8] != self.V[(self.opcode & 0x00F0) >> 4]:
             self.pc += 2
@@ -232,12 +236,13 @@ class Emulator:
 
 
     def xE000(self):
-        #TODO Controls
-        if self.opcode & 0xFF == 0x9E:
-            pass
+        if self.opcode & 0x00FF == 0x009E:
+            if self.key[self.V[((self.opcode & 0x0F00) >> 8)]]:
+                self.pc += 2
 
-        if self.opcode & 0xFF == 0xA1:
-            pass
+        if self.opcode & 0x00FF == 0x00A1:
+            if not self.key[self.V[((self.opcode & 0x0F00) >> 8)]]:
+                self.pc += 2
 
         self.pc += 2
 
@@ -248,7 +253,8 @@ class Emulator:
 
         # FX0A => VX = get_key() (Blocking!)
         if (self.opcode & 0x00FF) == 0x000A:
-            self.V[(self.opcode & 0x0F00) >> 8] = self.key
+            self.key_wait_flag = True
+            self.key_register = (self.opcode & 0x0F00) >> 8
 
         # FX15 => set_delay(VX)
         if (self.opcode & 0x00FF) == 0x0015:
@@ -300,23 +306,31 @@ class Emulator:
             self.memory[i+512] = rom[i]
 
     def gamestep(self):
-        if self.draw_flag:
-            self.draw_flag = False
+        if not self.key_wait_flag:
+            if self.draw_flag:
+                self.draw_flag = False
 
-        if self.delay_timer > 0:
-            self.delay_timer -= 1
+            if self.delay_timer > 0:
+                self.delay_timer -= 1
 
 
-        if self.sound_timer > 0:
-            if self.sound_timer == 1:
-                self.beep_flag = False
-            self.sound_timer -= 1
+            if self.sound_timer > 0:
+                if self.sound_timer == 1:
+                    self.beep_flag = False
+                self.sound_timer -= 1
 
-        self.process_opcode()
+            self.process_opcode()
 
 
     def gamestep_backwards(self):
         pass
 
-    def set_key(self, key):
-        pass
+    def press_key(self, key):
+        self.key[key] = True
+        if self.key_wait_flag:
+            self.key_wait_flag = False
+            self.V[self.key_register] = key
+
+
+    def release_key(self, key):
+        self.key[key] = False
