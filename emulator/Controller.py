@@ -1,8 +1,9 @@
-from view.controls import Controls
-from view.graphics import Graphics
+import time
 
-from model.emulator import Emulator
-from view.sound import Sound
+from model.Emulator import Emulator
+from view.IControls import Controls
+from view.IGraphics import Graphics
+from view.ISound import Sound
 
 
 class Controller:
@@ -22,6 +23,9 @@ class Controller:
         self.__frame_limit = False
         self.__debug = False
 
+        self.__time = 0
+
+
 
     #### Private
 
@@ -32,7 +36,12 @@ class Controller:
 
     def __call_controls(self):
         if self.controls is not None: # Calls the controls module, if present
-            self.emulator.set_key(self.controls.get_key())
+            for i in self.controls.get_keys_pressed():
+                self.emulator.press_key(i)
+
+            for i in self.controls.get_keys_released():
+                self.emulator.release_key(i)
+
 
     def __call_sound(self):
         if self.controls is not None: # Calls the sound module, if present
@@ -40,10 +49,12 @@ class Controller:
                 self.sound.beep()
 
     def __start_cycle_timer(self):
-        pass
+        self.__time = time.clock()
 
     def __wait_for_timer(self):
-        pass
+        elapsed = time.clock() - self.__time
+        if elapsed < (1/60):
+            time.sleep((1/60) - elapsed)
 
     #### Modules
 
@@ -83,6 +94,7 @@ class Controller:
 
     def enable_debug(self):
         self.__debug = True
+
 
     def print_status(self):
 

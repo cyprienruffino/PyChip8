@@ -1,4 +1,4 @@
-from view.sound import Sound
+from view.ISound import Sound
 
 
 class SoundStub(Sound):

@@ -189,3 +189,7 @@ class Disassembler:
             assembly += str(self.opcode_switch[(self.opcode & 0xF000)]()) + "\n"
 
         return assembly.replace("None","NOP")
+
+    def disassemble_op(self, opcode):
+        self.opcode = opcode
+        return str(self.opcode_switch[(self.opcode & 0xF000)]())

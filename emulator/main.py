@@ -2,17 +2,29 @@
 # Simple example
 ###
 
-from view.stub.controls_stub import ControlsStub
-from view.stub.graphics_stub import GraphicsStub
+from Controller import Controller
+from tools.Disassembler import Disassembler
+from view.stub.Controls_stub import ControlsStub
+from view.stub.Sound_stub import SoundStub
+from view.testgfx.IPoorgfx import PoorGraphics
 
-from controller import Controller
-from view.stub.sound_stub import SoundStub
-from disassembler import Disassembler
 
-def main():
+def run_emulator():
 
-    disassembler = Disassembler("TETRIS.bin", 512)
-    print(disassembler.disassemble())
+    gfx = PoorGraphics()
+    sound = SoundStub()
+    controls = ControlsStub()
+    runner = Controller(gfx, sound, controls)
+
+    runner.load_rom("TETRIS.bin")
+    runner.begin_loop_forwards()
+
+
+def disassemble():
+    dis = Disassembler("TETRIS.bin",512)
+    print(dis.disassemble())
+
 
 if __name__=="__main__":
-    main()
+    run_emulator()
+    #disassemble()

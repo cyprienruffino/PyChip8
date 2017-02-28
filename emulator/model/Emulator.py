@@ -169,7 +169,7 @@ class Emulator:
             self.pc += 2
 
         # 8XY4 => VX += VY
-        if(self.opcode & 0x000F)==0x0004:
+        if(self.opcode & 0x000F) == 0x0004:
             if self.V[(self.opcode & 0x00F0) >> 4] > (0xFF - self.V[(self.opcode & 0x0F00) >> 8]):
                 self.V[0xF] = 1
             else:
@@ -229,12 +229,13 @@ class Emulator:
         self.V[(self.opcode & 0x0F00) >> 8] = random.randint(0,255) & self.opcode & 0x00FF
         self.pc += 2
 
-
+    # DXYN = draw(VX,VY,N)
     def xD000(self):
-        x = self.V[((self.opcode & 0x0F00) >> 8)]
-        y = self.V[((self.opcode & 0x0F00) >> 4)]
+        x = self.V[((self.opcode & 0x0F00) >> 8)] -1
+        y = self.V[((self.opcode & 0x00F0) >> 4)] -1
         height = self.opcode & 0x000F
         self.V[0xF] = 0x0
+
 
         for ty in range(0,height):
             pixel = self.memory[self.I + ty]
@@ -243,14 +244,17 @@ class Emulator:
                     if self.gfx_pixels[(x + tx + ((y + ty) * 64))] == 1:
                         self.V[0xF] = 1
                     self.gfx_pixels[x + tx + ((y + ty) * 64)] |= 1
+        self.draw_flag = True
+        self.pc += 2
 
-    pass
 
     def xE000(self):
+        # EX9E = skip(if_pressed(VX))
         if self.opcode & 0x00FF == 0x009E:
             if self.key[self.V[((self.opcode & 0x0F00) >> 8)]]:
                 self.pc += 2
 
+        # EXA1 = skip(if_not_pressed(VX))
         if self.opcode & 0x00FF == 0x00A1:
             if not self.key[self.V[((self.opcode & 0x0F00) >> 8)]]:
                 self.pc += 2
@@ -305,8 +309,7 @@ class Emulator:
 
 
     def process_opcode(self):
-        self.opcode = self.memory[self.pc] << 8 | self.memory[self.pc + 1]
-
+        self.opcode = (self.memory[self.pc] << 8) | self.memory[self.pc + 1]
         self.opcode_switch.get(self.opcode & 0xF000)()
 
 
@@ -330,7 +333,7 @@ class Emulator:
                     self.beep_flag = False
                 self.sound_timer -= 1
 
-            self.process_opcode()
+        self.process_opcode()
 
 
     def gamestep_backwards(self):
