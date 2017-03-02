@@ -26,5 +26,5 @@ def disassemble():
 
 
 if __name__=="__main__":
-    run_emulator()
-    #disassemble()
+    #run_emulator()
+    disassemble()
