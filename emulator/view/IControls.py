@@ -9,3 +9,4 @@ class IControls:
 
     def get_keys_released(self) -> list:
         raise "Abstract class, cannot be instanciated"
+

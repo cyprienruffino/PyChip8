@@ -11,13 +11,13 @@ from view.testgfx.Poorgfx import PoorGraphics
 
 def run_emulator():
 
-    gfx = PoorGraphics()
-    sound = SoundStub()
-    controls = ControlsStub()
-    runner = Controller(gfx, sound, controls)
+    controller = Controller()
+    controller.add_sound("stub", SoundStub())
+    controller.add_gfx("poor", PoorGraphics())
+    controller.add_controls("stub",ControlsStub())
 
-    runner.load_rom("TETRIS.bin")
-    runner.begin_loop_forwards()
+    controller.load_rom("TETRIS.bin")
+    controller.begin_loop_forwards()
 
 
 def disassemble():
