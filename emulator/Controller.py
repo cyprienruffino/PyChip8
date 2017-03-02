@@ -24,6 +24,8 @@ class Controller:
         self.__frame_limit:bool = False
         self.__debug:bool = False
 
+        self.__started:bool = False
+
         self.__time:float = 0
 
 
@@ -60,15 +62,19 @@ class Controller:
 
     def __call_init_hooks(self) -> None:
         for _, v in self.init_hooks.items():
-            v()
+            v.call()
 
     def __call_pre_hooks(self) -> None:
         for _, v in self.pre_cycle_hooks.items():
-            v()
+            v.call()
 
     def __call_post_hooks(self) -> None:
         for _, v in self.post_cycle_hooks.items():
-            v()
+            v.call()
+
+    def __start(self):
+        self.__started = True
+        self.__call_init_hooks()
 
     #### Modules
 
@@ -126,6 +132,9 @@ class Controller:
         self.emulator.load_rom(rom)
 
     def step(self) -> None:
+        if not self.__started:
+            self.__start()
+
         self.__call_pre_hooks()
         self.__call_graphics()
         self.__call_graphics()
@@ -145,6 +154,9 @@ class Controller:
 
 
     def begin_loop_forwards(self) -> None:
+        if not self.__started:
+            self.__start()
+
         self.__looping_forwards = True
         while self.__looping_forwards:
 

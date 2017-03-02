@@ -336,12 +336,12 @@ class Emulator:
     def gamestep_backwards(self) -> None:
         pass
 
-    def press_key(self, key) -> None:
+    def press_key(self, key:int) -> None:
         self.key[key] = True
         if self.key_wait_flag:
             self.key_wait_flag = False
             self.V[self.key_register] = key
 
 
-    def release_key(self, key) -> None:
+    def release_key(self, key:int) -> None:
         self.key[key] = False

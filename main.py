@@ -3,6 +3,7 @@
 ###
 
 from Controller import Controller
+from sample_hooks.HelloWorldHook import HelloWorldHook
 from tools.Disassembler import Disassembler
 from view.stub.ControlsStub import ControlsStub
 from view.stub.SoundStub import SoundStub
@@ -16,9 +17,11 @@ def run_emulator():
     controller.add_gfx("poor", PoorGraphics())
     controller.add_controls("stub",ControlsStub())
 
-    controller.load_rom("TETRIS.bin")
-    controller.begin_loop_forwards()
+    controller.add_init_hook("helloworld", HelloWorldHook())
 
+    controller.load_rom("TETRIS.bin")
+    #controller.begin_loop_forwards()
+    controller.step()
 
 def disassemble():
     dis = Disassembler()
@@ -26,5 +29,5 @@ def disassemble():
 
 
 if __name__=="__main__":
-    #run_emulator()
-    disassemble()
+    run_emulator()
+    #disassemble()
