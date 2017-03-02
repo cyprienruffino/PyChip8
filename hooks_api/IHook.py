@@ -1,6 +1,6 @@
 
 
-class Hook:
+class IHook:
 
     def __init__(self, name:str):
         raise "Abstract class, cannot be instanciated"

@@ -15,9 +15,9 @@ class Controller:
         self.sound:dict[str,ISound] = dict()
         self.controls:dict[str,IControls] = dict()
 
-        self.pre_cycle_hooks:dict[str,IHook] = dict()
-        self.post_cycle_hooks:dict[str,IHook] = dict()
-        self.init_hooks:dict[str,IHook] = dict()
+        self.pre_cycle_hooks:dict[str, IHook] = dict()
+        self.post_cycle_hooks:dict[str, IHook] = dict()
+        self.init_hooks:dict[str, IHook] = dict()
 
         self.__looping_forwards:bool = False
         self.__looping_backwards:bool = False
