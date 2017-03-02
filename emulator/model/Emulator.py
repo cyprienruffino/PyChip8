@@ -3,6 +3,7 @@
 #
 import random
 
+
 class Emulator:
 
 #### RAM and operations initialisation
@@ -13,38 +14,38 @@ class Emulator:
         # 0x000 -> 0x1FF : CHIP-8 Interpreter
         # 0x050 -> 0x0A0 : Font set (4x5 pixel, 0-F)
         # 0x200 -> 0xFFF : Program ROM and work RAM
-        self.memory = bytearray(4096)
+        self.memory:bytearray = bytearray(4096)
 
         # Stack
         # 16*2 bytes and stack pointer
-        self.stack = bytearray(32)
-        self.sp = 0x00
+        self.stack:bytearray = bytearray(32)
+        self.sp:int = 0x00
 
         # Graphics array (64*32px), black and white
-        self.gfx_pixels = bytearray(64*32)
+        self.gfx_pixels:bytearray = bytearray(64*32)
 
         # Current operation
-        self.opcode = 0x0000
+        self.opcode:int = 0x0000
 
         # Current keys
-        self.key = [False] * 16
+        self.key:list = [False] * 16
 
         # Registers : 15 usable, 1 for the carry flag
-        self.V = bytearray(16)
+        self.V:bytearray = bytearray(16)
 
         # Index register and program counter
-        self.I = 0x0000
-        self.pc = 0x0200
+        self.I:int = 0x0000
+        self.pc:int = 0x0200
 
         # Timers
-        self.delay_timer = 0
-        self.sound_timer = 0
+        self.delay_timer:int = 0
+        self.sound_timer:int = 0
 
         # Fontset
         # 16 pre-loaded sprites : 0-F
         # 1 Sprite : 8x5 px
         # 5 bytes each
-        fontset = bytearray(
+        fontset:bytearray = bytearray(
             b'\xF0\x90\x90\x90\xF0'
             b'\x20\x60\x20\x20\x70'
             b'\xF0\x10\xF0\x80\xF0'
@@ -69,27 +70,24 @@ class Emulator:
         del fontset
 
         # Flags
-        self.draw_flag = False
-        self.beep_flag = False
-        self.key_wait_flag = True
+        self.draw_flag:bool = False
+        self.beep_flag:bool = False
+        self.key_wait_flag:bool = True
 
-        self.key_register = 0x0 # Register which will receive the key when waiting for key
+        self.key_register:int = 0x0 # Register which will receive the key when waiting for key
 
-        self.opcode_switch = {
-            0x0000: self.x0000, 0x1000: self.x1000,
-            0x2000: self.x2000, 0x3000: self.x3000,
-            0x4000: self.x4000, 0x5000: self.x5000,
-            0x6000: self.x6000, 0x7000: self.x7000,
-            0x8000: self.x8000, 0x9000: self.x9000,
-            0xA000: self.xA000, 0xB000: self.xB000,
-            0xC000: self.xC000, 0xD000: self.xD000,
-            0xE000: self.xE000, 0xF000: self.xF000,
+        self.__opcode_switch = {
+            0x0000: self.__x0000, 0x1000: self.__x1000,
+            0x2000: self.__x2000, 0x3000: self.__x3000,
+            0x4000: self.__x4000, 0x5000: self.__x5000,
+            0x6000: self.__x6000, 0x7000: self.__x7000,
+            0x8000: self.__x8000, 0x9000: self.__x9000,
+            0xA000: self.__xA000, 0xB000: self.__xB000,
+            0xC000: self.__xC000, 0xD000: self.__xD000,
+            0xE000: self.__xE000, 0xF000: self.__xF000,
         }
 
-    def none(self):
-        self.pc += 2
-
-    def x0000(self):
+    def __x0000(self):
         #Clear screen
         if self.opcode == 0x00E0:
             self.gfx_pixels = bytearray(64 * 32)
@@ -105,11 +103,11 @@ class Emulator:
         self.pc+=2
 
     # 1XXX => Jump(XXX)
-    def x1000(self):
+    def __x1000(self):
         self.pc = self.opcode & 0x0FFF
 
     # 2XXX => Call(XXX)
-    def x2000(self):
+    def __x2000(self):
         try:
             self.sp += 2
             self.stack[self.sp] = (self.pc & 0xFF00) >> 8
@@ -119,35 +117,35 @@ class Emulator:
             pass
 
     # 3XKK => skip_next(VX == KK)
-    def x3000(self):
+    def __x3000(self):
         self.pc+=2
         if self.V[(self.opcode & 0x0F00) >> 8] == self.opcode & 0x00FF:
             self.pc += 2
 
     # 4XKK => skip_next(VX != KK)
-    def x4000(self):
+    def __x4000(self):
         self.pc += 2
         if self.V[(self.opcode & 0x0F00) >> 8] != self.opcode & 0x00FF:
             self.pc += 2
 
     # 5XY0 => skip_next(VX == VY)
-    def x5000(self):
+    def __x5000(self):
         self.pc += 2
         if self.V[(self.opcode & 0x0F00) >> 8] == self.V[(self.opcode & 0x00F0) >> 4]:
             self.pc += 2
 
     # 6XKK => VX = KK
-    def x6000(self):
+    def __x6000(self):
         self.V[(self.opcode & 0x0F00) >> 8] = self.opcode & 0x00FF
         self.pc += 2
 
     # 7XKK => VX += KK
-    def x7000(self):
+    def __x7000(self):
         self.V[(self.opcode & 0x0F00) >> 8] = (self.V[(self.opcode & 0x0F00) >> 8] + self.opcode & 0x00FF) % 256
         self.pc += 2
 
     #Binary ops
-    def x8000(self):
+    def __x8000(self):
         # 8XY0 => VX = VY
         if (self.opcode & 0x000F) == 0x0000:
             self.V[(self.opcode & 0x0F00) >> 8] = self.V[(self.opcode & 0x00F0) >> 4]
@@ -210,32 +208,31 @@ class Emulator:
             self.pc += 2
 
     # 9XY0 => skip_next(VX!=VY)
-    def x9000(self):
+    def __x9000(self):
         self.pc += 2
         if self.V[(self.opcode & 0x0F00) >> 8] != self.V[(self.opcode & 0x00F0) >> 4]:
             self.pc += 2
 
     # AKKK => I=KKK
-    def xA000(self):
+    def __xA000(self):
         self.I=self.opcode & 0x0FFF
         self.pc += 2
 
     # BKKK => Jump(V0+KKK)
-    def xB000(self):
+    def __xB000(self):
         self.pc = self.opcode & 0x0FFF + self.V[0]
 
     # CXKK => VX=Rand(V0,255)+KK
-    def xC000(self):
+    def __xC000(self):
         self.V[(self.opcode & 0x0F00) >> 8] = random.randint(0,255) & self.opcode & 0x00FF
         self.pc += 2
 
     # DXYN = draw(VX,VY,N)
-    def xD000(self):
+    def __xD000(self):
         x = self.V[((self.opcode & 0x0F00) >> 8)] -1
         y = self.V[((self.opcode & 0x00F0) >> 4)] -1
         height = self.opcode & 0x000F
         self.V[0xF] = 0x0
-
 
         for ty in range(0,height):
             pixel = self.memory[self.I + ty]
@@ -248,7 +245,7 @@ class Emulator:
         self.pc += 2
 
 
-    def xE000(self):
+    def __xE000(self):
         # EX9E = skip(if_pressed(VX))
         if self.opcode & 0x00FF == 0x009E:
             if self.key[self.V[((self.opcode & 0x0F00) >> 8)]]:
@@ -261,7 +258,7 @@ class Emulator:
 
         self.pc += 2
 
-    def xF000(self):
+    def __xF000(self):
         # FX07 => VX = get_delay()
         if (self.opcode & 0x00FF) == 0x0007:
             self.V[(self.opcode & 0x0F00) >> 8] = self.delay_timer
@@ -308,18 +305,18 @@ class Emulator:
         self.pc += 2
 
 
-    def process_opcode(self):
+    def __process_opcode(self):
         self.opcode = (self.memory[self.pc] << 8) | self.memory[self.pc + 1]
-        self.opcode_switch.get(self.opcode & 0xF000)()
+        self.__opcode_switch.get(self.opcode & 0xF000)()
 
 
 
-    #### Engine
-    def load_rom(self, rom):
+    #### Public functions
+    def load_rom(self, rom:bytearray) -> None:
         for i in range(0,len(rom)):
             self.memory[i+512] = rom[i]
 
-    def gamestep(self):
+    def gamestep(self) -> None:
         if not self.key_wait_flag:
             if self.draw_flag:
                 self.draw_flag = False
@@ -333,18 +330,18 @@ class Emulator:
                     self.beep_flag = False
                 self.sound_timer -= 1
 
-        self.process_opcode()
+        self.__process_opcode()
 
 
-    def gamestep_backwards(self):
+    def gamestep_backwards(self) -> None:
         pass
 
-    def press_key(self, key):
+    def press_key(self, key) -> None:
         self.key[key] = True
         if self.key_wait_flag:
             self.key_wait_flag = False
             self.V[self.key_register] = key
 
 
-    def release_key(self, key):
+    def release_key(self, key) -> None:
         self.key[key] = False

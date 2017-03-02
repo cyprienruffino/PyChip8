@@ -4,9 +4,9 @@
 
 from Controller import Controller
 from tools.Disassembler import Disassembler
-from view.stub.Controls_stub import ControlsStub
-from view.stub.Sound_stub import SoundStub
-from view.testgfx.IPoorgfx import PoorGraphics
+from view.stub.ControlsStub import ControlsStub
+from view.stub.SoundStub import SoundStub
+from view.testgfx.Poorgfx import PoorGraphics
 
 
 def run_emulator():
@@ -21,8 +21,8 @@ def run_emulator():
 
 
 def disassemble():
-    dis = Disassembler("TETRIS.bin",512)
-    print(dis.disassemble())
+    dis = Disassembler()
+    print(dis.disassemble_rom("TETRIS.bin",512))
 
 
 if __name__=="__main__":

@@ -1,13 +1,13 @@
-from view.IGraphics import Graphics
+from view.IGraphics import IGraphics
 
-class PoorGraphics(Graphics):
+class PoorGraphics(IGraphics):
     def __init__(self):
         pass
 
-    def open_view(self):
+    def open_view(self) -> None:
         pass
 
-    def draw(self, gfx:bytearray):
+    def draw(self, gfx:bytearray) -> None:
         line=""
         for y in range(0,32):
             for x in range(0,64):
