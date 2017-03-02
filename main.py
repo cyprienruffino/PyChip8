@@ -19,13 +19,13 @@ def run_emulator():
 
     controller.add_init_hook("helloworld", HelloWorldHook())
 
-    controller.load_rom("TETRIS.bin")
+    controller.load_rom("ROMs/TETRIS.bin")
     #controller.begin_loop_forwards()
     controller.step()
 
 def disassemble():
     dis = Disassembler()
-    print(dis.disassemble_rom("TETRIS.bin",512))
+    print(dis.disassemble_rom("ROMs/TETRIS.bin",512))
 
 
 if __name__=="__main__":
