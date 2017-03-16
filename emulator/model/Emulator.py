@@ -74,7 +74,7 @@ class Emulator:
         self.beep_flag:bool = False
         self.key_wait_flag:bool = True
 
-        self.key_register:int = 0x0 # Register which will receive the key when waiting for key
+        self.__key_register:int = 0x0 # Register which will receive the key when waiting for key
 
         self.__opcode_switch = {
             0x0000: self.__x0000, 0x1000: self.__x1000,
@@ -266,7 +266,7 @@ class Emulator:
         # FX0A => VX = get_key() (Blocking!)
         if (self.opcode & 0x00FF) == 0x000A:
             self.key_wait_flag = True
-            self.key_register = (self.opcode & 0x0F00) >> 8
+            self.__key_register = (self.opcode & 0x0F00) >> 8
 
         # FX15 => set_delay(VX)
         if (self.opcode & 0x00FF) == 0x0015:
@@ -340,7 +340,7 @@ class Emulator:
         self.key[key] = True
         if self.key_wait_flag:
             self.key_wait_flag = False
-            self.V[self.key_register] = key
+            self.V[self.__key_register] = key
 
 
     def release_key(self, key:int) -> None:
