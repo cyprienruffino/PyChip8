@@ -1,7 +1,7 @@
-from IHook import IHook
+from hooks.Hook import Hook
 
 
-class HelloWorldHook(IHook):
+class HelloWorldHook(Hook):
     def __init__(self):
         pass
 
