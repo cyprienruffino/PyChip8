@@ -1,4 +1,4 @@
-from hooks.Hook import Hook
+from api.hooks.Hook import Hook
 
 
 class OpcodeHook(Hook):

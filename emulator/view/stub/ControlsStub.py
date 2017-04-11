@@ -1,4 +1,4 @@
-from view.IControls import IControls
+from emulator.view.IControls import IControls
 
 
 class ControlsStub(IControls):

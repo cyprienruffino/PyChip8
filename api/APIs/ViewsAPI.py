@@ -1,6 +1,6 @@
 
 #API to control views
-from Controller import Controller
+from emulator.Controller import Controller
 
 
 class ViewsAPI:

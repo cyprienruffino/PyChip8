@@ -1,10 +1,10 @@
 import time
 
-from hooks import Hook
-from model.Emulator import Emulator
-from view.IControls import IControls
-from view.IGraphics import IGraphics
-from view.ISound import ISound
+from api.hooks import Hook
+from emulator.model.Emulator import Emulator
+from emulator.view.IControls import IControls
+from emulator.view.IGraphics import IGraphics
+from emulator.view.ISound import ISound
 
 
 class Controller:

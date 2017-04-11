@@ -1,4 +1,4 @@
-from Controller import Controller
+from emulator.Controller import Controller
 
 
 class ControlAPI:

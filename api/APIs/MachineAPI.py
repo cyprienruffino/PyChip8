@@ -1,5 +1,5 @@
 #The low level API, to interact directly with the emulator memory
-from Controller import Controller
+from emulator.Controller import Controller
 
 
 class MachineAPI:

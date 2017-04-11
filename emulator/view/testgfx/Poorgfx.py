@@ -1,4 +1,4 @@
-from view.IGraphics import IGraphics
+from emulator.view.IGraphics import IGraphics
 
 class PoorGraphics(IGraphics):
     def __init__(self):

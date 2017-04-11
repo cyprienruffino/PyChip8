@@ -1,4 +1,4 @@
-from view.ISound import ISound
+from emulator.view.ISound import ISound
 
 
 class SoundStub(ISound):

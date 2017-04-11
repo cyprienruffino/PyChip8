@@ -1,14 +1,14 @@
 ###
 # Simple example
 ###
-from API import API
-from Controller import Controller
-from OpcodeHook import OpcodeHook
+from api.API import API
+from emulator.Controller import Controller
+from sample_hooks.OpcodeHook import OpcodeHook
 from sample_hooks.HelloWorldHook import HelloWorldHook
 from tools.Disassembler import Disassembler
-from view.stub.ControlsStub import ControlsStub
-from view.stub.SoundStub import SoundStub
-from view.testgfx.Poorgfx import PoorGraphics
+from emulator.view.stub.ControlsStub import ControlsStub
+from emulator.view.stub.SoundStub import SoundStub
+from emulator.view.testgfx.Poorgfx import PoorGraphics
 
 
 def run_emulator():

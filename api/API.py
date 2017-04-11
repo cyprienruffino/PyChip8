@@ -1,10 +1,10 @@
-from APIs.ControlAPI import ControlAPI
-from APIs.HooksAPI import HooksAPI
-from APIs.MachineAPI import MachineAPI
-from APIs.ToolsAPI import ToolsAPI
-from APIs.ViewsAPI import ViewsAPI
-from Controller import Controller
-from hooks.Hook import Hook
+from api.APIs.ControlAPI import ControlAPI
+from api.APIs.HooksAPI import HooksAPI
+from api.APIs.MachineAPI import MachineAPI
+from api.APIs.ToolsAPI import ToolsAPI
+from api.APIs.ViewsAPI import ViewsAPI
+from emulator.Controller import Controller
+from api.hooks.Hook import Hook
 
 
 class API:
