@@ -1,4 +1,5 @@
-from view.IGraphics import IGraphics
+from emulator.view.IGraphics import IGraphics
+
 
 class GraphicsStub(IGraphics):
     def __init__(self):
@@ -7,6 +8,5 @@ class GraphicsStub(IGraphics):
     def open_view(self) -> None:
         pass
 
-    def draw(self, gfx:bytearray) -> None:
+    def draw(self, gfx: bytearray) -> None:
         pass
-

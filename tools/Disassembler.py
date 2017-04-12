@@ -2,8 +2,8 @@
 # Emulator engine main class
 #
 
-class Disassembler:
 
+class Disassembler:
     def __init__(self):
         self.__opcode_switch = {
             0x0000: self.__x0000, 0x1000: self.__x1000,
@@ -17,16 +17,14 @@ class Disassembler:
         }
         self.__opcode = 0
 
-
     def __x0000(self):
-        #Clear screen
+        # Clear screen
         if self.__opcode == 0x00E0:
             return "CLS"
 
-        #Return
+        # Return
         if self.__opcode == 0x00EE:
             return "RET"
-
 
     # 1XXX => Jump(XXX)
     def __x1000(self):
@@ -34,12 +32,11 @@ class Disassembler:
 
     # 2XXX => Call(XXX)
     def __x2000(self):
-        return "CALL "+ str(self.__opcode & 0x0FFF)
+        return "CALL " + str(self.__opcode & 0x0FFF)
 
     # 3XKK => skip_next(VX == KK)
     def __x3000(self):
-        return "SE V"+str((self.__opcode & 0x0F00) >> 8) + ", " + str(self.__opcode & 0x00FF)
-
+        return "SE V" + str((self.__opcode & 0x0F00) >> 8) + ", " + str(self.__opcode & 0x00FF)
 
     # 4XKK => skip_next(VX != KK)
     def __x4000(self):
@@ -49,7 +46,6 @@ class Disassembler:
     def __x5000(self):
         return "SE V" + str((self.__opcode & 0x0F00) >> 8) + ", V" + str((self.__opcode & 0x00F0) >> 4)
 
-
     # 6XKK => VX = KK
     def __x6000(self):
         return "LD V" + str((self.__opcode & 0x0F00) >> 8) + ", " + str(self.__opcode & 0x00FF)
@@ -58,7 +54,7 @@ class Disassembler:
     def __x7000(self):
         return "ADD V" + str((self.__opcode & 0x0F00) >> 8) + ", " + str(self.__opcode & 0x00FF)
 
-    #Binary ops
+    # Binary ops
     def __x8000(self):
         # 8XY0 => VX = VY
         if (self.__opcode & 0x000F) == 0x0000:
@@ -77,7 +73,7 @@ class Disassembler:
             return "XOR V" + str((self.__opcode & 0x0F00) >> 8) + ", V" + str((self.__opcode & 0x00F0) >> 4)
 
         # 8XY4 => VX += VY
-        if(self.__opcode & 0x000F) == 0x0004:
+        if (self.__opcode & 0x000F) == 0x0004:
             return "ADD V" + str((self.__opcode & 0x0F00) >> 8) + ", V" + str((self.__opcode & 0x00F0) >> 4)
 
         # 8XY5 => VX -= VY
@@ -102,11 +98,11 @@ class Disassembler:
 
     # AKKK => I=KKK
     def __xA000(self):
-        return "LD I, "+str(self.__opcode & 0x0FFF)
+        return "LD I, " + str(self.__opcode & 0x0FFF)
 
     # BKKK => Jump(V0+KKK)
     def __xB000(self):
-        return "JP V0, "+str(self.__opcode & 0x0FFF)
+        return "JP V0, " + str(self.__opcode & 0x0FFF)
 
     # CXKK => VX=Rand(V0,255)+KK
     def __xC000(self):
@@ -114,9 +110,8 @@ class Disassembler:
 
     # DXYN = draw(VX,VY,N)
     def __xD000(self):
-        return "DRW V" + str((self.__opcode & 0x0F00) >> 8) + ", V" + str((self.__opcode & 0x00F0) >> 4) + " " + str((self.__opcode & 0x000F))
-
-
+        return "DRW V" + str((self.__opcode & 0x0F00) >> 8) + ", V" + str((self.__opcode & 0x00F0) >> 4) + " " + str(
+            (self.__opcode & 0x000F))
 
     def __xE000(self):
         # EX9E = skip(if_pressed(VX))
@@ -126,7 +121,6 @@ class Disassembler:
         # EXA1 = skip(if_not_pressed(VX))
         if self.__opcode & 0x00FF == 0x00A1:
             return "SKNP V" + str((self.__opcode & 0x0F00) >> 8)
-
 
     def __xF000(self):
         # FX07 => VX = get_delay()
@@ -165,8 +159,6 @@ class Disassembler:
         if (self.__opcode & 0x00FF) == 0x0065:
             return "LD V" + str((self.__opcode & 0x0F00) >> 8) + ", [I]"
 
-
-
     def disassemble_rom(self, rom_path, romsize) -> str:
         assembly = ""
         rom = bytearray(romsize)
@@ -179,11 +171,11 @@ class Disassembler:
                 i += 1
 
         romsize = romsize
-        for i in range(0,romsize,2):
-            self.__opcode= (rom[i] << 8) + rom[i + 1]
+        for i in range(0, romsize, 2):
+            self.__opcode = (rom[i] << 8) + rom[i + 1]
             assembly += str(self.__opcode_switch[(self.__opcode & 0xF000)]()) + "\n"
 
-        return assembly.replace("None","NOP")
+        return assembly.replace("None", "NOP")
 
     def disassemble_op(self, opcode) -> str:
         self.__opcode = opcode

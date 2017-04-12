@@ -10,38 +10,33 @@ from emulator.view.ISound import ISound
 class Controller:
     def __init__(self):
 
+        self.emulator: Emulator = Emulator()
 
-        self.emulator:Emulator=Emulator()
+        self.__gfx: dict = dict()
+        self.__sound: dict = dict()
+        self.__controls: dict = dict()
 
-        self.__gfx:dict = dict()
-        self.__sound:dict = dict()
-        self.__controls:dict = dict()
-
-        self.__pre_cycle_hooks:dict = dict()
+        self.__pre_cycle_hooks: dict = dict()
         self.__pre_frame_hooks = dict()
-        self.__post_cycle_hooks:dict = dict()
+        self.__post_cycle_hooks: dict = dict()
         self.__post_frame_hooks = dict()
-        self.__init_hooks:dict = dict()
+        self.__init_hooks: dict = dict()
 
-        self.__looping_forwards:bool = False
-        self.__looping_backwards:bool = False
-        self.__frame_limit:bool = False
-        self.__debug:bool = False
+        self.__looping_forwards: bool = False
+        self.__looping_backwards: bool = False
+        self.__frame_limit: bool = False
+        self.__debug: bool = False
 
-        self.__started:bool = False
+        self.__started: bool = False
 
-        self.__time:float = 0
+        self.__time: float = 0
 
-
-
-
-    #### Private
+    # Private
 
     def __call_graphics(self):
         if self.emulator.draw_flag:
-            for _,v in self.__gfx.items():
+            for _, v in self.__gfx.items():
                 v.draw(self.emulator.gfx_pixels)
-
 
     def __call_controls(self):
         for _, v in self.__controls.items():
@@ -50,7 +45,6 @@ class Controller:
 
             for i in v.get_keys_released():
                 self.emulator.release_key(i)
-
 
     def __call_sound(self):
         for _, v in self.__sound.items():
@@ -62,8 +56,8 @@ class Controller:
 
     def __wait_for_timer(self):
         elapsed = time.clock() - self.__time
-        if elapsed < (1/60):
-            time.sleep((1/60) - elapsed)
+        if elapsed < (1 / 60):
+            time.sleep((1 / 60) - elapsed)
 
     def __call_init_hooks(self) -> None:
         for _, v in self.__init_hooks.items():
@@ -89,30 +83,29 @@ class Controller:
         self.__started = True
         self.__call_init_hooks()
 
+    # Modules
 
-    #### Modules
-
-    def add_gfx(self, name:str, gfx: IGraphics) -> None:
+    def add_gfx(self, name: str, gfx: IGraphics) -> None:
         self.__gfx[name] = gfx
 
-    def add_sound(self, name:str, sound: ISound) -> None:
-        self.__sound[name]=sound
+    def add_sound(self, name: str, sound: ISound) -> None:
+        self.__sound[name] = sound
 
-    def add_controls(self, name:str, controls: IControls) -> None:
+    def add_controls(self, name: str, controls: IControls) -> None:
         self.__controls[name] = controls
 
-    ### Hooks
+    # Hooks
 
-    def add_init_hook(self, name: str, hook:Hook) -> None:
+    def add_init_hook(self, name: str, hook: Hook) -> None:
         self.__init_hooks[name] = hook
 
-    def add_pre_cycle_hook(self, name: str, hook:Hook) -> None:
+    def add_pre_cycle_hook(self, name: str, hook: Hook) -> None:
         self.__pre_cycle_hooks[name] = hook
 
-    def add_post_cycle_hook(self, name: str, hook:Hook) -> None:
+    def add_post_cycle_hook(self, name: str, hook: Hook) -> None:
         self.__post_cycle_hooks[name] = hook
 
-    def add_pre_frame_hook(self, name: str, hook:Hook) -> None:
+    def add_pre_frame_hook(self, name: str, hook: Hook) -> None:
         self.__pre_frame_hooks[name] = hook
 
     def add_post_frame_hook(self, name: str, hook: Hook) -> None:
@@ -136,10 +129,9 @@ class Controller:
             return True
         return False
 
+    # Controls
 
-    #### Controls
-
-    def load_rom(self, path) -> None:
+    def load_rom(self, path: str) -> bytearray:
         with open(path, "rb") as f:
             rom = bytearray(512)
             byte = f.read(1)
@@ -150,6 +142,7 @@ class Controller:
                 i += 1
 
         self.emulator.load_rom(rom)
+        return rom
 
     def step(self) -> None:
         if not self.__started:
@@ -174,9 +167,6 @@ class Controller:
         if frame:
             self.__call_post_frame_hooks()
 
-
-
-
     def step_backwards(self) -> None:
         self.__call_pre_hooks()
         self.__call_graphics()
@@ -184,7 +174,6 @@ class Controller:
         self.__call_sound()
         self.emulator.gamestep_backwards()
         self.__call_post_hooks()
-
 
     def start_looping_forwards(self) -> None:
         if not self.__started:
