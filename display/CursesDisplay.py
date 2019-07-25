@@ -1,7 +1,7 @@
-from emulator.view.IGraphics import IGraphics
+from .IDisplay import IDisplay
 
 
-class PoorGraphics(IGraphics):
+class CursesDisplay(IGraphics):
     def __init__(self):
         pass
 

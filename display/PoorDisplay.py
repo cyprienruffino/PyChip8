@@ -1,4 +1,4 @@
-from emulator.view.IGraphics import IGraphics
+from .IDisplay import IDisplay
 
 
 class PoorGraphics(IGraphics):

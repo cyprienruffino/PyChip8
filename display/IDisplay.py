@@ -1,4 +1,4 @@
-class IGraphics:
+class IDisplay:
     def __init__(self):
         raise NotImplementedError("Abstract class, cannot be instanciated")
 

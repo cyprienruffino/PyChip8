@@ -1,7 +1,7 @@
-from emulator.view.IGraphics import IGraphics
+from .IDisplay import IDisplay
 
 
-class GraphicsStub(IGraphics):
+class DisplayStub(IGraphics):
     def __init__(self):
         pass
 
