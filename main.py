@@ -1,11 +1,9 @@
-###
-# Simple example
-###
+#!/usr/bin/env python
+
 from api.API import API
 from emulator.Controller import Controller
 from sample_hooks.OpcodeHook import OpcodeHook
 from sample_hooks.HelloWorldHook import HelloWorldHook
-from tools.Disassembler import Disassembler
 from emulator.view.stub.ControlsStub import ControlsStub
 from emulator.view.stub.SoundStub import SoundStub
 from emulator.view.testgfx.Poorgfx import PoorGraphics
@@ -17,6 +15,7 @@ def run_emulator():
     controller.add_gfx("poor", PoorGraphics())
     # controller.add_gfx("stub", GraphicsStub())
     controller.add_controls("stub", ControlsStub())
+    controller.set_frame_limit(True)
 
     api = API(controller)
     # controller.add_init_hook("helloworld", api.create_hook(HelloWorldHook))
@@ -27,14 +26,8 @@ def run_emulator():
     for i in range(0, 300):
         controller.next_frame()
 
-        # controller.start_looping_forwards()
-
-
-def disassemble():
-    dis = Disassembler()
-    print(dis.disassemble_rom("ROMs/TETRIS.bin", 512))
+    controller.start_looping_forwards()
 
 
 if __name__ == "__main__":
     run_emulator()
-    # disassemble()
