@@ -59,11 +59,11 @@ class Controller:
         if elapsed < (1 / 60):
             time.sleep((1 / 60) - elapsed)
 
-    def __call_init_hooks(self) -> None:
+    def __call_init_hooks(self) :
         for _, v in self.__init_hooks.items():
             v.call()
 
-    def __call_pre_hooks(self) -> None:
+    def __call_pre_hooks(self) :
         for _, v in self.__pre_cycle_hooks.items():
             v.call()
 
@@ -71,7 +71,7 @@ class Controller:
         for _, v in self.__pre_frame_hooks.items():
             v.call()
 
-    def __call_post_hooks(self) -> None:
+    def __call_post_hooks(self) :
         for _, v in self.__post_cycle_hooks.items():
             v.call()
 
@@ -85,30 +85,30 @@ class Controller:
 
     # Modules
 
-    def add_gfx(self, name: str, gfx: IGraphics) -> None:
+    def add_gfx(self, name: str, gfx: IGraphics) :
         self.__gfx[name] = gfx
 
-    def add_sound(self, name: str, sound: ISound) -> None:
+    def add_sound(self, name: str, sound: ISound) :
         self.__sound[name] = sound
 
-    def add_controls(self, name: str, controls: IControls) -> None:
+    def add_controls(self, name: str, controls: IControls) :
         self.__controls[name] = controls
 
     # Hooks
 
-    def add_init_hook(self, name: str, hook: Hook) -> None:
+    def add_init_hook(self, name: str, hook: Hook) :
         self.__init_hooks[name] = hook
 
-    def add_pre_cycle_hook(self, name: str, hook: Hook) -> None:
+    def add_pre_cycle_hook(self, name: str, hook: Hook) :
         self.__pre_cycle_hooks[name] = hook
 
-    def add_post_cycle_hook(self, name: str, hook: Hook) -> None:
+    def add_post_cycle_hook(self, name: str, hook: Hook) :
         self.__post_cycle_hooks[name] = hook
 
-    def add_pre_frame_hook(self, name: str, hook: Hook) -> None:
+    def add_pre_frame_hook(self, name: str, hook: Hook) :
         self.__pre_frame_hooks[name] = hook
 
-    def add_post_frame_hook(self, name: str, hook: Hook) -> None:
+    def add_post_frame_hook(self, name: str, hook: Hook) :
         self.__post_frame_hooks[name] = hook
 
     def remove_init_hook(self, name: str) -> bool:
@@ -144,7 +144,7 @@ class Controller:
         self.emulator.load_rom(rom)
         return rom
 
-    def step(self) -> None:
+    def step(self) :
         if not self.__started:
             self.__start()
 
@@ -157,7 +157,6 @@ class Controller:
             self.__call_pre_frame_hooks()
 
         self.__call_graphics()
-        self.__call_graphics()
         self.__call_controls()
         self.__call_sound()
 
@@ -167,7 +166,7 @@ class Controller:
         if frame:
             self.__call_post_frame_hooks()
 
-    def step_backwards(self) -> None:
+    def step_backwards(self):
         self.__call_pre_hooks()
         self.__call_graphics()
         self.__call_controls()
@@ -175,7 +174,7 @@ class Controller:
         self.emulator.gamestep_backwards()
         self.__call_post_hooks()
 
-    def start_looping_forwards(self) -> None:
+    def start_looping_forwards(self):
         if not self.__started:
             self.__start()
 
@@ -190,7 +189,7 @@ class Controller:
             if self.__frame_limit:
                 self.__wait_for_timer()
 
-    def start_looping_backwards(self) -> None:
+    def start_looping_backwards(self):
         self.__looping_backwards = True
         while self.__looping_backwards:
 
@@ -202,18 +201,21 @@ class Controller:
             if self.__frame_limit:
                 self.__wait_for_timer()
 
-    def stop_looping_forwards(self) -> None:
+    def stop_looping_forwards(self):
         self.__looping_forwards = False
 
-    def stop_looping_backwards(self) -> None:
+    def stop_looping_backwards(self):
         self.__looping_backwards = False
 
-    def next_frame(self) -> None:
+    def next_frame(self):
         while not self.emulator.draw_flag:
             self.step()
         self.step()
 
-    def previous_frame(self) -> None:
+    def previous_frame(self):
         while not self.emulator.draw_flag:
             self.step_backwards()
         self.step_backwards()
+
+    def set_frame_limit(self, val:bool):
+        self.__frame_limit = val
