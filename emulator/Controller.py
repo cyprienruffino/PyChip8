@@ -1,18 +1,18 @@
 import time
 
 from api.hooks import Hook
-from emulator.model.Emulator import Emulator
-from emulator.view.IControls import IControls
-from emulator.view.IGraphics import IGraphics
-from emulator.view.ISound import ISound
+from emulator.CPU import CPU
+from display.IDisplay import IDisplay
+from sound.ISound import ISound
 
 
+FPS=120
 class Controller:
     def __init__(self):
 
-        self.emulator: Emulator = Emulator()
+        self.CPU: CPU = CPU()
 
-        self.__gfx: dict = dict()
+        self.__display: dict = dict()
         self.__sound: dict = dict()
         self.__controls: dict = dict()
 
@@ -22,9 +22,8 @@ class Controller:
         self.__post_frame_hooks = dict()
         self.__init_hooks: dict = dict()
 
-        self.__looping_forwards: bool = False
-        self.__looping_backwards: bool = False
-        self.__frame_limit: bool = False
+        self.__looping: bool = False
+        self.__frame_limit: bool = True
         self.__debug: bool = False
 
         self.__started: bool = False
@@ -32,23 +31,22 @@ class Controller:
         self.__time: float = 0
 
     # Private
-
     def __call_graphics(self):
-        if self.emulator.draw_flag:
-            for _, v in self.__gfx.items():
-                v.draw(self.emulator.gfx_pixels)
+        if self.CPU.draw_flag:
+            for _, v in self.__display.items():
+                v.draw(self.CPU.display_pixels)
 
     def __call_controls(self):
-        for _, v in self.__controls.items():
+        for _, v in self.__display.items():
             for i in v.get_keys_pressed():
-                self.emulator.press_key(i)
+                self.CPU.press_key(i)
 
             for i in v.get_keys_released():
-                self.emulator.release_key(i)
+                self.CPU.release_key(i)
 
     def __call_sound(self):
         for _, v in self.__sound.items():
-            if self.emulator.beep_flag:
+            if self.CPU.beep_flag:
                 v.beep()
 
     def __start_cycle_timer(self):
@@ -56,8 +54,11 @@ class Controller:
 
     def __wait_for_timer(self):
         elapsed = time.clock() - self.__time
-        if elapsed < (1 / 60):
-            time.sleep((1 / 60) - elapsed)
+        if elapsed < (1 / FPS):
+            time.sleep((1 / FPS) - elapsed)
+
+
+    # Hooks calls
 
     def __call_init_hooks(self) :
         for _, v in self.__init_hooks.items():
@@ -85,14 +86,11 @@ class Controller:
 
     # Modules
 
-    def add_gfx(self, name: str, gfx: IGraphics) :
-        self.__gfx[name] = gfx
+    def add_display(self, name: str, display: IDisplay) :
+        self.__display[name] = display
 
     def add_sound(self, name: str, sound: ISound) :
         self.__sound[name] = sound
-
-    def add_controls(self, name: str, controls: IControls) :
-        self.__controls[name] = controls
 
     # Hooks
 
@@ -141,7 +139,7 @@ class Controller:
                 byte = f.read(1)
                 i += 1
 
-        self.emulator.load_rom(rom)
+        self.CPU.load_rom(rom)
         return rom
 
     def step(self) :
@@ -149,7 +147,7 @@ class Controller:
             self.__start()
 
         frame = False
-        if self.emulator.draw_flag:
+        if self.CPU.draw_flag:
             frame = True
 
         self.__call_pre_hooks()
@@ -160,21 +158,13 @@ class Controller:
         self.__call_controls()
         self.__call_sound()
 
-        self.emulator.gamestep()
+        self.CPU.gamestep()
 
         self.__call_post_hooks()
         if frame:
             self.__call_post_frame_hooks()
 
-    def step_backwards(self):
-        self.__call_pre_hooks()
-        self.__call_graphics()
-        self.__call_controls()
-        self.__call_sound()
-        self.emulator.gamestep_backwards()
-        self.__call_post_hooks()
-
-    def start_looping_forwards(self):
+    def start(self):
         if not self.__started:
             self.__start()
 
@@ -189,33 +179,14 @@ class Controller:
             if self.__frame_limit:
                 self.__wait_for_timer()
 
-    def start_looping_backwards(self):
-        self.__looping_backwards = True
-        while self.__looping_backwards:
-
-            if self.__frame_limit:
-                self.__start_cycle_timer()
-
-            self.step_backwards()
-
-            if self.__frame_limit:
-                self.__wait_for_timer()
-
-    def stop_looping_forwards(self):
+   
+    def stop_looping(self):
         self.__looping_forwards = False
 
-    def stop_looping_backwards(self):
-        self.__looping_backwards = False
-
     def next_frame(self):
-        while not self.emulator.draw_flag:
+        while not self.CPU.draw_flag:
             self.step()
         self.step()
-
-    def previous_frame(self):
-        while not self.emulator.draw_flag:
-            self.step_backwards()
-        self.step_backwards()
 
     def set_frame_limit(self, val:bool):
         self.__frame_limit = val

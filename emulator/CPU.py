@@ -1,10 +1,10 @@
 #
-# Emulator engine main class
+# CPU engine main class
 #
 import random
 
 
-class Emulator:
+class CPU:
     # RAM and operations initialisation
 
     def __init__(self):
@@ -21,7 +21,7 @@ class Emulator:
         self.sp: int = 0x00
 
         # Graphics array (64*32px), black and white
-        self.gfx_pixels: bytearray = bytearray(64 * 32)
+        self.display_pixels: bytearray = bytearray(64 * 32)
 
         # Current operation
         self.opcode: int = 0x0000
@@ -35,6 +35,9 @@ class Emulator:
         # Index register and program counter
         self.I: int = 0x0000
         self.pc: int = 0x0200
+        
+        # Register which will receive the key when waiting for key
+        self.__key_register: int = 0x0 
 
         # Timers
         self.delay_timer: int = 0
@@ -71,9 +74,9 @@ class Emulator:
         # Flags
         self.draw_flag: bool = False
         self.beep_flag: bool = False
-        self.key_wait_flag: bool = True
+        self.key_wait_flag: bool = False
 
-        self.__key_register: int = 0x0  # Register which will receive the key when waiting for key
+        
 
         self.__opcode_switch = {
             0x0000: self.__x0000, 0x1000: self.__x1000,
@@ -89,7 +92,7 @@ class Emulator:
     def __x0000(self):
         # Clear screen
         if self.opcode == 0x00E0:
-            self.gfx_pixels = bytearray(64 * 32)
+            self.display_pixels = bytearray(64 * 32)
 
         # Return
         if self.opcode == 0x00EE:
@@ -237,9 +240,9 @@ class Emulator:
             pixel = self.memory[self.I + ty]
             for tx in range(0, 8):
                 if (pixel & (0x80 >> tx)) != 0:
-                    if self.gfx_pixels[(x + tx + ((y + ty) * 64))] == 1:
+                    if self.display_pixels[(x + tx + ((y + ty) * 64))] == 1:
                         self.V[0xF] = 1
-                    self.gfx_pixels[x + tx + ((y + ty) * 64)] |= 1
+                    self.display_pixels[x + tx + ((y + ty) * 64)] ^= 1
         self.draw_flag = True
         self.pc += 2
 
@@ -324,16 +327,13 @@ class Emulator:
                     self.beep_flag = False
                 self.sound_timer -= 1
 
-        self.__process_opcode()
-
-    def gamestep_backwards(self) -> None:
-        pass
+            self.__process_opcode()
 
     def press_key(self, key: int) -> None:
         self.key[key] = True
         if self.key_wait_flag:
             self.key_wait_flag = False
-            self.V[self.__key_register] = key
+        self.V[self.__key_register] = key
 
     def release_key(self, key: int) -> None:
         self.key[key] = False
