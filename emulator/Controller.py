@@ -1,7 +1,7 @@
 import time
 
 from api.hooks import Hook
-from emulator.CPU import CPU
+from emulator.Chip8 import Chip8
 from display.IDisplay import IDisplay
 from sound.ISound import ISound
 
@@ -11,7 +11,7 @@ FPS = 20
 class Controller:
     def __init__(self):
 
-        self.CPU: CPU = CPU()
+        self.CPU: Chip8 = Chip8()
 
         self.__display: dict = dict()
         self.__sound: dict = dict()

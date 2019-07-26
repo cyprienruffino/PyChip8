@@ -4,7 +4,7 @@
 import random
 
 
-class CPU:
+class Chip8:
     # RAM and operations initialisation
 
     def __init__(self):
