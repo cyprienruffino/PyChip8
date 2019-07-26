@@ -13,6 +13,8 @@ It only provides a curses view, I will maybe add a PyGame view.
 $ python main.py path_to_rom
 
 # Keybindings
+AZERTY keybindings
+
 | | | | | | | | | |
 |---|---|---|---|---|---|---|---|---|
 |1|2|3|C|/|1|2|3|4|
@@ -37,7 +39,9 @@ Hook routines can be added via the hooks API. Currently, hooks are:
 - post_frame_hooks: Called after each frame rendering
 
 # Known issues
+- No QWERTY keybindings
 - The current display is really ugly
+- The first line of the screen is displayed as the last line
 - The curses view screws up the terminal display when killed
 - The APIs are under development
 - No sound
