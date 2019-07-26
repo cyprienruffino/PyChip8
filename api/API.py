@@ -2,7 +2,6 @@ from api.APIs.ControlAPI import ControlAPI
 from api.APIs.HooksAPI import HooksAPI
 from api.APIs.MachineAPI import MachineAPI
 from api.APIs.ToolsAPI import ToolsAPI
-from api.APIs.ViewsAPI import ViewsAPI
 from emulator.Controller import Controller
 from api.hooks.Hook import Hook
 
@@ -12,7 +11,6 @@ class API:
         self.__controller = controller
         self.machine: MachineAPI = MachineAPI(self.__controller)
         self.tools: ToolsAPI = ToolsAPI(self.__controller)
-        self.views: ViewsAPI = ViewsAPI(self.__controller)
         self.hooks: HooksAPI = HooksAPI(self.__controller)
         self.control: ControlAPI = ControlAPI(self.__controller)
 

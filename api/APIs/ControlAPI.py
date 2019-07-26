@@ -6,8 +6,7 @@ class ControlAPI:
         self.__controller = controller
 
     def pause(self) -> None:
-        self.__controller.stop_looping_backwards()
-        self.__controller.stop_looping_forwards()
+        self.__controller.stop_looping()
 
         """
         Piloting commands:
@@ -16,5 +15,4 @@ class ControlAPI:
         -Emulate key press/release
         -Skip frames
         -Load a rom
-        -Reflexion and hooks management
         """
