@@ -336,5 +336,3 @@ class CPU:
             self.key_wait_flag = False
             self.V[self.__key_register] = key
 
-    def release_key(self, key: int) -> None:
-        self.key[key] = 0

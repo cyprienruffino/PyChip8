@@ -66,9 +66,10 @@ class CursesDisplay(IDisplay):
             line = ""
         try:
             self.__console.render(screen)
-        except Exception as e:
+        except Exception:
             self.__console.close()
-            raise e
+            print("Display is too small, minimum size: 128*32")
+            exit(0)
 
     def get_keys_pressed(self) -> set:
         keys = set()
@@ -82,6 +83,3 @@ class CursesDisplay(IDisplay):
                 c = self.__console.stdscr.getch()
 
         return keys
-
-    def get_keys_released(self) -> set:
-        return set(range(16)) - self.get_keys_pressed()

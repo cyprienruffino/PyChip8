@@ -33,23 +33,13 @@ class Controller:
 
     # Private
     def __call_graphics(self):
-        if self.CPU.draw_flag:
-            if self.__frame_limit:
-                self.__start_cycle_timer()
-            for _, v in self.__display.items():
-                v.draw(self.CPU.display_pixels)
-            if self.__frame_limit:
-                self.__wait_for_timer()
+        for _, v in self.__display.items():
+            v.draw(self.CPU.display_pixels)
 
     def __call_presses(self):
         for _, v in self.__display.items():
             for i in v.get_keys_pressed():
                 self.CPU.press_key(i)
-
-    def __call_releases(self):
-        for _, v in self.__display.items():
-            for i in v.get_keys_released():
-                self.CPU.release_key(i)
 
     def __call_sound(self):
         for _, v in self.__sound.items():
@@ -151,24 +141,24 @@ class Controller:
         if not self.__started:
             self.__start()
 
-        frame = False
         if self.CPU.draw_flag:
-            frame = True
-
-        self.__call_pre_hooks()
-        if frame:
             self.__call_pre_frame_hooks()
+            if self.__frame_limit:
+                self.__start_cycle_timer()
 
-        self.__call_graphics()
+                self.__call_graphics()
+
         self.__call_presses()
         self.__call_sound()
 
+        self.__call_pre_hooks()
         self.CPU.gamestep()
-
-        # self.__call_releases()
         self.__call_post_hooks()
-        if frame:
+
+        if self.CPU.draw_flag:
             self.__call_post_frame_hooks()
+            if self.__frame_limit:
+                self.__wait_for_timer()
 
     def start(self):
         if not self.__started:
