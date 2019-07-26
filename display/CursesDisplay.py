@@ -56,8 +56,8 @@ class CursesDisplay(IDisplay):
     def draw(self, display: bytearray) -> None:
         screen = []
         line = ""
-        for y in range(HEIGHT):
-            for x in range(WIDTH):
+        for y in range(-1, HEIGHT-1):
+            for x in range(-1, WIDTH-1):
                 if display[x + 64 * y]:
                     line += '##'
                 else:

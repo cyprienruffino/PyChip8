@@ -10,8 +10,8 @@ class PoorGraphics(IDisplay):
 
     def draw(self, gfx: bytearray) -> None:
         line = ""
-        for y in range(0, 32):
-            for x in range(0, 64):
+        for y in range(-1, 31):
+            for x in range(-1, 63):
                 if gfx[x+64*y]:
                     line += '##'
                 else:
@@ -19,7 +19,6 @@ class PoorGraphics(IDisplay):
             print(line)
             line = ""
         print("-" * 128)
-
 
     def get_keys_pressed(self) -> list:
         return []
