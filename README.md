@@ -14,6 +14,7 @@ $ python main.py path_to_rom
 
 # Keybindings
 AZERTY keybindings
+
 | | | | | | | | | |
 |---|---|---|---|---|---|---|---|---|
 |1|2|3|C|/|1|2|3|4|
