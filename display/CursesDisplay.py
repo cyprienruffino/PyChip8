@@ -11,11 +11,12 @@ HEIGHT = 32
 WIDTH = 64
 
 keymap = {
-    38: 0, 195:1, 34:2, 39:3,
-    ord("a"):4, ord("z"):5, ord("e"):6, ord("r"):7, 
-    ord("q"):8, ord("s"):9, ord("d"):10, ord("f"):11,
-    ord("w"):12, ord("x"):13, ord("c"):14, ord("v"):15
+    38: 0, 195: 1, 34: 2, 39: 3,
+    ord("a"): 4, ord("z"): 5, ord("e"): 6, ord("r"): 7,
+    ord("q"): 8, ord("s"): 9, ord("d"): 10, ord("f"): 11,
+    ord("w"): 12, ord("x"): 13, ord("c"): 14, ord("v"): 15
 }
+
 
 @singleton
 class Console:
@@ -41,9 +42,9 @@ class Console:
         Render a frame
         :param chars: The characters map
         """
-        #self.stdscr.clear()
+        # self.stdscr.clear()
         for line in range(HEIGHT):
-            for char in range(WIDTH):
+            for char in range(WIDTH*2):
                 self.stdscr.addch(line, char, ord(chars[line][char]))
         self.stdscr.refresh()
 
@@ -57,10 +58,10 @@ class CursesDisplay(IDisplay):
         line = ""
         for y in range(HEIGHT):
             for x in range(WIDTH):
-                if display[x+64*y]:
-                    line += '#'
+                if display[x + 64 * y]:
+                    line += '##'
                 else:
-                    line += " "
+                    line += "  "
             screen.append(line)
             line = ""
         try:
@@ -69,28 +70,18 @@ class CursesDisplay(IDisplay):
             self.__console.close()
             raise e
 
-    def get_keys_pressed(self) -> list:
+    def get_keys_pressed(self) -> set:
         keys = set()
         c = self.__console.stdscr.getch()
         while c != -1:
             try:
                 keys.add(keymap[c])
-                c = self.__console.stdscr.getch()
             except KeyError:
                 pass
-        
+            finally:
+                c = self.__console.stdscr.getch()
+
         return keys
 
-
-    def get_keys_released(self) -> list:
-        keys = set()
-        c = self.__console.stdscr.getch()
-        while c != -1:
-            try:
-                keys.add(keymap[c])
-                c = self.__console.stdscr.getch()
-            except KeyError:
-                pass
-        
-        return set(range(16)) - keys
-
+    def get_keys_released(self) -> set:
+        return set(range(16)) - self.get_keys_pressed()

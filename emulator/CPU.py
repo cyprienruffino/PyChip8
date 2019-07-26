@@ -27,7 +27,7 @@ class CPU:
         self.opcode: int = 0x0000
 
         # Current keys
-        self.key: list = [False] * 16
+        self.key: list = [0] * 16
 
         # Registers : 15 usable, 1 for the carry flag
         self.V: bytearray = bytearray(16)
@@ -35,9 +35,9 @@ class CPU:
         # Index register and program counter
         self.I: int = 0x0000
         self.pc: int = 0x0200
-        
+
         # Register which will receive the key when waiting for key
-        self.__key_register: int = 0x0 
+        self.__key_register: int = 0x0
 
         # Timers
         self.delay_timer: int = 0
@@ -75,8 +75,6 @@ class CPU:
         self.draw_flag: bool = False
         self.beep_flag: bool = False
         self.key_wait_flag: bool = False
-
-        
 
         self.__opcode_switch = {
             0x0000: self.__x0000, 0x1000: self.__x1000,
@@ -251,11 +249,14 @@ class CPU:
         if self.opcode & 0x00FF == 0x009E:
             if self.key[self.V[((self.opcode & 0x0F00) >> 8)]]:
                 self.pc += 2
+                self.key[self.V[((self.opcode & 0x0F00) >> 8)]] = 0
 
         # EXA1 = skip(if_not_pressed(VX))
         if self.opcode & 0x00FF == 0x00A1:
             if not self.key[self.V[((self.opcode & 0x0F00) >> 8)]]:
                 self.pc += 2
+            else:
+                self.key[self.V[((self.opcode & 0x0F00) >> 8)]] = 0
 
         self.pc += 2
 
@@ -264,7 +265,7 @@ class CPU:
         if (self.opcode & 0x00FF) == 0x0007:
             self.V[(self.opcode & 0x0F00) >> 8] = self.delay_timer
 
-        # FX0A => VX = get_key() (Blocking!)
+        # FX0A => VX = get_key()
         if (self.opcode & 0x00FF) == 0x000A:
             self.key_wait_flag = True
             self.__key_register = (self.opcode & 0x0F00) >> 8
@@ -330,10 +331,10 @@ class CPU:
             self.__process_opcode()
 
     def press_key(self, key: int) -> None:
-        self.key[key] = True
+        self.key[key] = 1
         if self.key_wait_flag:
             self.key_wait_flag = False
-        self.V[self.__key_register] = key
+            self.V[self.__key_register] = key
 
     def release_key(self, key: int) -> None:
-        self.key[key] = False
+        self.key[key] = 0

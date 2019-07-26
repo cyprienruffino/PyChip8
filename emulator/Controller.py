@@ -5,8 +5,9 @@ from emulator.CPU import CPU
 from display.IDisplay import IDisplay
 from sound.ISound import ISound
 
+FPS = 20
 
-FPS=120
+
 class Controller:
     def __init__(self):
 
@@ -33,14 +34,20 @@ class Controller:
     # Private
     def __call_graphics(self):
         if self.CPU.draw_flag:
+            if self.__frame_limit:
+                self.__start_cycle_timer()
             for _, v in self.__display.items():
                 v.draw(self.CPU.display_pixels)
+            if self.__frame_limit:
+                self.__wait_for_timer()
 
-    def __call_controls(self):
+    def __call_presses(self):
         for _, v in self.__display.items():
             for i in v.get_keys_pressed():
                 self.CPU.press_key(i)
 
+    def __call_releases(self):
+        for _, v in self.__display.items():
             for i in v.get_keys_released():
                 self.CPU.release_key(i)
 
@@ -57,14 +64,12 @@ class Controller:
         if elapsed < (1 / FPS):
             time.sleep((1 / FPS) - elapsed)
 
-
     # Hooks calls
-
-    def __call_init_hooks(self) :
+    def __call_init_hooks(self):
         for _, v in self.__init_hooks.items():
             v.call()
 
-    def __call_pre_hooks(self) :
+    def __call_pre_hooks(self):
         for _, v in self.__pre_cycle_hooks.items():
             v.call()
 
@@ -72,7 +77,7 @@ class Controller:
         for _, v in self.__pre_frame_hooks.items():
             v.call()
 
-    def __call_post_hooks(self) :
+    def __call_post_hooks(self):
         for _, v in self.__post_cycle_hooks.items():
             v.call()
 
@@ -86,27 +91,27 @@ class Controller:
 
     # Modules
 
-    def add_display(self, name: str, display: IDisplay) :
+    def add_display(self, name: str, display: IDisplay):
         self.__display[name] = display
 
-    def add_sound(self, name: str, sound: ISound) :
+    def add_sound(self, name: str, sound: ISound):
         self.__sound[name] = sound
 
     # Hooks
 
-    def add_init_hook(self, name: str, hook: Hook) :
+    def add_init_hook(self, name: str, hook: Hook):
         self.__init_hooks[name] = hook
 
-    def add_pre_cycle_hook(self, name: str, hook: Hook) :
+    def add_pre_cycle_hook(self, name: str, hook: Hook):
         self.__pre_cycle_hooks[name] = hook
 
-    def add_post_cycle_hook(self, name: str, hook: Hook) :
+    def add_post_cycle_hook(self, name: str, hook: Hook):
         self.__post_cycle_hooks[name] = hook
 
-    def add_pre_frame_hook(self, name: str, hook: Hook) :
+    def add_pre_frame_hook(self, name: str, hook: Hook):
         self.__pre_frame_hooks[name] = hook
 
-    def add_post_frame_hook(self, name: str, hook: Hook) :
+    def add_post_frame_hook(self, name: str, hook: Hook):
         self.__post_frame_hooks[name] = hook
 
     def remove_init_hook(self, name: str) -> bool:
@@ -142,7 +147,7 @@ class Controller:
         self.CPU.load_rom(rom)
         return rom
 
-    def step(self) :
+    def step(self):
         if not self.__started:
             self.__start()
 
@@ -155,11 +160,12 @@ class Controller:
             self.__call_pre_frame_hooks()
 
         self.__call_graphics()
-        self.__call_controls()
+        self.__call_presses()
         self.__call_sound()
 
         self.CPU.gamestep()
 
+        # self.__call_releases()
         self.__call_post_hooks()
         if frame:
             self.__call_post_frame_hooks()
@@ -168,25 +174,17 @@ class Controller:
         if not self.__started:
             self.__start()
 
-        self.__looping_forwards = True
-        while self.__looping_forwards:
-
-            if self.__frame_limit:
-                self.__start_cycle_timer()
-
+        self.__looping = True
+        while self.__looping:
             self.step()
 
-            if self.__frame_limit:
-                self.__wait_for_timer()
-
-   
     def stop_looping(self):
-        self.__looping_forwards = False
+        self.__looping = False
 
     def next_frame(self):
         while not self.CPU.draw_flag:
             self.step()
         self.step()
 
-    def set_frame_limit(self, val:bool):
+    def set_frame_limit(self, val: bool):
         self.__frame_limit = val
