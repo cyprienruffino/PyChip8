@@ -38,6 +38,7 @@ Hook routines can be added via the hooks API. Currently, hooks are:
 
 # Known issues
 - The current display is really ugly
+- The curses view screws up the terminal display when killed
 - The APIs are under development
 - No sound
 
