@@ -19,7 +19,7 @@ def run_emulator(rom):
 
 
 if __name__ == "__main__":
-    if len(sys.argv < 2):
+    if len(sys.argv) < 2:
         print("Usage: python main.py rompath")
         exit(0)
     run_emulator(sys.argv[1])
