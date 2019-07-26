@@ -1,4 +1,4 @@
-# C8
+# PyChip8
  CHIP-8 Emulator
 
 The goal here is to create a flexible CHIP-8 emulator with hooks and tools to experiment with emulation and hopefully create a machine learning environment.
@@ -38,6 +38,7 @@ Hook routines can be added via the hooks API. Currently, hooks are:
 
 # Known issues
 - The current display is really ugly
+- The curses view screws up the terminal display when killed
 - The APIs are under development
 - No sound
 
