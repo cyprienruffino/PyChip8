@@ -11,10 +11,10 @@ HEIGHT = 32
 WIDTH = 64
 
 keymap = {
-    38: 0, 195: 1, 34: 2, 39: 3,
-    ord("a"): 4, ord("z"): 5, ord("e"): 6, ord("r"): 7,
-    ord("q"): 8, ord("s"): 9, ord("d"): 10, ord("f"): 11,
-    ord("w"): 12, ord("x"): 13, ord("c"): 14, ord("v"): 15
+    38:       0x1, 195:      0x2,      34:  0x3,   39:     0xC,
+    ord("a"): 0x4, ord("z"): 0x5, ord("e"): 0x6, ord("r"): 0xD,
+    ord("q"): 0x7, ord("s"): 0x8, ord("d"): 0x9, ord("f"): 0xE,
+    ord("w"): 0xA, ord("x"): 0x0, ord("c"): 0xB, ord("v"): 0xF
 }
 
 
