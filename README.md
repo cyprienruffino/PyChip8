@@ -41,9 +41,9 @@ Hook routines can be added via the hooks API. Currently, hooks are:
 # Known issues
 - No QWERTY keybindings
 - The current display is really ugly
-- Predefined sprites don't work
 - The curses view screws up the terminal display when killed
 - The APIs are under development
+- The framerate needs to be adjusted
 - No sound
 
 # ROMs
