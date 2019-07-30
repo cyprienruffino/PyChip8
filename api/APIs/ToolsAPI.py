@@ -1,6 +1,6 @@
 # API to use predefined tools such as the Disassembler
 from emulator.Controller import Controller
-from tools.Disassembler import Disassembler
+from tools.disassembler import Disassembler
 
 
 class ToolsAPI:
