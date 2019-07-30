@@ -49,3 +49,8 @@ Hook routines can be added via the hooks API. Currently, hooks are:
 # ROMs
 I don't own any of the provided ROMs, you can find them on 
 https://github.com/dmatlack/chip8/tree/master/roms
+
+# References
+The CowGod CHIP-8 Technical Reference v1.0
+
+http://devernay.free.fr/hacks/chip8/C8TECH10.HTM
