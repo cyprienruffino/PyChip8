@@ -5,7 +5,7 @@ from emulator.Chip8 import Chip8
 from display.IDisplay import IDisplay
 from sound.ISound import ISound
 
-FPS = 20
+FPS = 30
 
 
 class Controller:
@@ -126,16 +126,15 @@ class Controller:
 
     def load_rom(self, path: str) -> bytearray:
         with open(path, "rb") as f:
-            rom = bytearray(512)
+            rom = []
             byte = f.read(1)
-            i = 0
             while byte != b'':
-                rom[i] = byte[0]
+                rom.append(byte[0])
                 byte = f.read(1)
-                i += 1
 
-        self.CPU.load_rom(rom)
-        return rom
+        if len(rom) > 0xC8F:
+            raise Exception("ROM too large: ", len(rom), " bytes")
+        return self.CPU.load_rom(bytearray(rom))
 
     def step(self):
         if not self.__started:
