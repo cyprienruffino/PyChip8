@@ -44,7 +44,7 @@ Hook routines can be added via the hooks API. Currently, hooks are:
 - The curses view screws up the terminal display when killed
 - The APIs are under development
 - The framerate needs to be adjusted
-- No sound
+- Sound only supports aplayer
 
 # ROMs
 I don't own any of the provided ROMs, you can find them on 
