@@ -1,18 +1,16 @@
 #!/usr/bin/env python
 import sys
 
+from display.CursesDisplay import CursesDisplay
 # from api.API import API
 from emulator.Controller import Controller
-from display.CursesDisplay import CursesDisplay
-from display.PoorDisplay import PoorGraphics
-from sample_hooks.HelloWorldHook import HelloWorldHook
-from sample_hooks.OpcodeHook import OpcodeHook
+from sound.Aplay import Aplay
 
 
 def run_emulator(rom):
     controller = Controller()
     controller.add_display("curses", CursesDisplay())
-    #controller.add_display("curses", PoorGraphics())
+    controller.add_sound("mpg123", Aplay())
     controller.set_frame_limit(True)
 
     # api = API(controller)

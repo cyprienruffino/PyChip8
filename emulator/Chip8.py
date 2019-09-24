@@ -294,6 +294,8 @@ class Chip8:
         # FX18 => VX = set_sound(VX)
         if (self.op & 0x00FF) == 0x0018:
             self.sound_timer = self.V[(self.op & 0x0F00) >> 8]
+            if self.sound_timer > 0:
+                self.beep_flag = True
 
         # FX1E => I += VX
         if (self.op & 0x00FF) == 0x001E:
@@ -313,18 +315,14 @@ class Chip8:
         # FX55 => save(VX, &I)
         if (self.op & 0x00FF) == 0x0055:
             for i in range(0, ((self.op & 0x0F00) >> 8) + 1):
-                try:
-                    self.memory[i + self.I] = self.V[i]
-                except:
-                    pass
+                self.memory[i + self.I] = self.V[i]
+            self.I += ((self.op & 0x0F00) >> 8) + 1
 
         # FX65 => load(VX, &I)
         if (self.op & 0x00FF) == 0x0065:
             for i in range(0, ((self.op & 0x0F00) >> 8) + 1):
-                try:
-                    self.V[i] = self.memory[i + self.I]
-                except:
-                    pass
+                self.V[i] = self.memory[i + self.I]
+            self.I += ((self.op & 0x0F00) >> 8) + 1
 
         self.pc += 2
 
@@ -347,9 +345,8 @@ class Chip8:
                 self.delay_timer -= 1
 
             if self.sound_timer > 0:
-                if self.sound_timer == 1:
-                    self.beep_flag = False
-                self.sound_timer -= 1
+                self.sound_timer = 0
+                self.beep_flag = False
 
             self.__process_op()
 
